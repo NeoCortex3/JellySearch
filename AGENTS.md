@@ -120,6 +120,30 @@ ssh omv 'docker logs jellyfin --since 2m 2>&1 | grep "Loaded plugin: JellySearch
   `ApiClient.getJSON(ApiClient.getUrl('UserViews', { userId: ApiClient.getCurrentUserId() }))`
   ermitteln.
 
+## Plugin-Repository & Release (GitHub)
+
+- Repo: <https://github.com/NeoCortex3/JellySearch>
+- **Katalog-URL** (in Jellyfin unter Dashboard → Plugins → Repositories eintragen):
+  `https://neocortex3.github.io/JellySearch/manifest.json`
+- Releases: <https://github.com/NeoCortex3/JellySearch/releases>
+
+Ablauf für eine neue Version:
+
+1. Version in `build.yaml` **und** `Directory.Build.props` erhöhen (beide gleich).
+2. Commit + Push nach `main` (löst den `Build Plugin`-Workflow aus).
+3. Release erstellen – Tag = Version ohne `v`, z. B. `1.0.0.0` – **oder** manuell:
+   `gh workflow run publish.yaml -f version=1.0.0.0`
+4. Der `Publish Plugin`-Workflow baut mit **JPRM**, hängt die ZIP (+ `.md5`) an das
+   Release und veröffentlicht die `manifest.json` auf **GitHub Pages**.
+
+Wichtig:
+
+- `JellySearch.sln` muss im Root liegen (JPRM sucht dort `.sln`/`.csproj`).
+- `build.yaml` ist die JPRM-Metadatenquelle (Name, GUID, `targetAbi`, `artifacts`, `imageUrl`).
+- `checksum` in der Manifest ist die MD5 der ZIP (von JPRM gesetzt).
+- GitHub Pages ist auf „Source: GitHub Actions" gestellt; `configure-pages` mit
+  `enablement: true` aktiviert es notfalls selbst.
+
 ## Konventionen
 
 - Frontend: vanilla JS (ES5-kompatibel), IIFE, keine Build-Toolchain, keine externen Libs.
