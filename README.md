@@ -4,7 +4,7 @@
 <img width="827" height="755" alt="Bildschirmfoto_2026-09-19_13-22-55" src="https://github.com/user-attachments/assets/711d16ac-2225-47e4-867d-f9ee971af8e7" />
 <br><br>
 Installation:<br>
-Admin -> Plugins -> Rpositorties verwalten -> Neues Repository -> https://neocortex3.github.io/JellySearch/manifest.json<br>
+Admin -> Plugins -> Repositorties verwalten -> Neues Repository -> https://neocortex3.github.io/JellySearch/manifest.json<br>
 Admin -> Plugins -> Verfügbar -> Jellysearch -> installieren
 <br><br>
 Gemacht mit <img width="15" height="15" alt="grafik" src="https://github.com/user-attachments/assets/1a75021d-18aa-46ca-a637-619520b45702" /> und <img width="15" height="15" alt="grafik" src="https://github.com/user-attachments/assets/b82793e9-fdb0-4fde-b0e6-524b8f35e373" />
