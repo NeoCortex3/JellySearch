@@ -1,0 +1,136 @@
+name: 'Publish Plugin'
+
+# Erzeugt bei einem Release (oder manuell) das Plugin-ZIP, haengt es an das
+# Release und veroeffentlicht die manifest.json auf GitHub Pages.
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (z. B. 1.0.0.0)'
+        required: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      zipname: ${{ steps.stage.outputs.zipname }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Resolve version
+        id: meta
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+          else
+            TAG="${{ github.event.inputs.version }}"
+          fi
+          VERSION="${TAG#v}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Build plugin (JPRM)
+        id: jprm
+        uses: oddstr13/jellyfin-plugin-repository-manager@v1.1.1
+        with:
+          dotnet-target: 'net10.0'
+          version: ${{ steps.meta.outputs.version }}
+
+      - name: Stage artifact + checksum
+        id: stage
+        shell: bash
+        run: |
+          mkdir -p release
+          cp "${{ steps.jprm.outputs.artifact }}" release/
+          cd release
+          ZIPNAME="$(basename ./*.zip)"
+          echo "zipname=${ZIPNAME}" >> "$GITHUB_OUTPUT"
+          md5sum "${ZIPNAME}" | awk '{print toupper($1)}' > "${ZIPNAME}.md5"
+          ls -l
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          files: release/*
+          fail_on_unmatched_files: true
+
+      - name: Upload zip for manifest job
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-zip
+          path: release/*.zip
+          if-no-files-found: error
+
+  pages:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download zip
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-zip
+          path: release
+
+      - name: Install JPRM
+        run: python3 -m pip install --user jprm
+
+      - name: Build manifest
+        shell: bash
+        run: |
+          REPO_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+          PLUGIN_URL="https://github.com/${{ github.repository }}/releases/download/${{ needs.build.outputs.tag }}/${{ needs.build.outputs.zipname }}"
+          echo "Repository-URL: ${REPO_URL}"
+          echo "Plugin-URL:     ${PLUGIN_URL}"
+
+          mkdir -p repo
+          jprm repo init ./repo
+          jprm repo add --url "${REPO_URL}" --plugin-url "${PLUGIN_URL}" ./repo ./release/*.zip
+
+          mkdir -p pages
+          cp ./repo/manifest.json ./pages/manifest.json
+          echo '--- manifest.json ---'
+          cat ./pages/manifest.json
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./pages
+
+  deploy:
+    needs: pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

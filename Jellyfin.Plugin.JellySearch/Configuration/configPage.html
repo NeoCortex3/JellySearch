@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>JellySearch</title>
+</head>
+<body>
+    <div id="JellySearchConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="JellySearchConfigForm">
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="EnableInjection" name="EnableInjection" type="checkbox" is="emby-checkbox" />
+                            <span>Web-Oberfl&auml;che erweitern</span>
+                        </label>
+                        <div class="fieldDescription">
+                            Injiziert die zus&auml;tzlichen Filter in die Jellyfin-Weboberfl&auml;che.
+                            Nach dem Speichern muss der Browser neu geladen werden.
+                        </div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="DefaultRangeYears">Standard-Zeitfenster (Jahre)</label>
+                        <input id="DefaultRangeYears" name="DefaultRangeYears" type="number" is="emby-input" min="1" max="100" />
+                        <div class="fieldDescription">Nur informativ; der Bereichsregler nutzt immer die vorhandenen Jahre.</div>
+                    </div>
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                            <span>Speichern</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var JellySearchConfig = {
+                pluginUniqueId: '8aae07da-5941-4120-8004-a22b60e82888'
+            };
+
+            document.querySelector('#JellySearchConfigPage')
+                .addEventListener('pageshow', function () {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(JellySearchConfig.pluginUniqueId).then(function (config) {
+                        document.querySelector('#EnableInjection').checked = config.EnableInjection !== false;
+                        document.querySelector('#DefaultRangeYears').value = config.DefaultRangeYears || 10;
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+            document.querySelector('#JellySearchConfigForm')
+                .addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(JellySearchConfig.pluginUniqueId).then(function (config) {
+                        config.EnableInjection = document.querySelector('#EnableInjection').checked;
+                        config.DefaultRangeYears = parseInt(document.querySelector('#DefaultRangeYears').value, 10) || 10;
+                        ApiClient.updatePluginConfiguration(JellySearchConfig.pluginUniqueId, config).then(function (result) {
+                            Dashboard.processPluginConfigurationUpdateResult(result);
+                        });
+                    });
+                    return false;
+                });
+        </script>
+    </div>
+</body>
+</html>

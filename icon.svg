@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00A4DC"/>
+      <stop offset="1" stop-color="#7B2FBE"/>
+    </linearGradient>
+    <filter id="knob" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- Slider-Tracks -->
+  <g stroke-linecap="round">
+    <line x1="104" y1="168" x2="408" y2="168" stroke="#ffffff" stroke-opacity="0.32" stroke-width="20"/>
+    <line x1="104" y1="168" x2="322" y2="168" stroke="#ffffff" stroke-width="20"/>
+
+    <line x1="104" y1="256" x2="408" y2="256" stroke="#ffffff" stroke-opacity="0.32" stroke-width="20"/>
+    <line x1="104" y1="256" x2="196" y2="256" stroke="#ffffff" stroke-width="20"/>
+
+    <line x1="104" y1="344" x2="408" y2="344" stroke="#ffffff" stroke-opacity="0.32" stroke-width="20"/>
+    <line x1="104" y1="344" x2="356" y2="344" stroke="#ffffff" stroke-width="20"/>
+  </g>
+
+  <!-- Knobs -->
+  <g fill="#ffffff" filter="url(#knob)">
+    <circle cx="322" cy="168" r="34"/>
+    <circle cx="196" cy="256" r="34"/>
+    <circle cx="356" cy="344" r="34"/>
+  </g>
+</svg>

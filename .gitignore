@@ -1,0 +1,15 @@
+# Build-Ausgaben
+bin/
+obj/
+artifacts/
+repo/
+*.user
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.suo
+
+# Pakete
+*.nupkg

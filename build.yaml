@@ -1,0 +1,18 @@
+---
+name: "JellySearch"
+guid: "8aae07da-5941-4120-8004-a22b60e82888"
+version: "1.0.0.0"
+targetAbi: "12.1.0.0"
+framework: "net10.0"
+overview: "Erweiterte Filter für Filme und Serien: Jahres-Schieberegler, Tag-Raster und Tags ausschließen."
+description: >
+  Fügt der Jellyfin-Weboberfläche eine zusätzliche Filter-Schaltfläche neben den
+  bestehenden Filtern hinzu. Bietet einen Jahres-Bereichsregler, eine übersichtliche
+  Tag-Auswahl in mehreren Reihen sowie das Ausschließen von Tags.
+category: "General"
+owner: "neocortex"
+imageUrl: "https://raw.githubusercontent.com/NeoCortex3/JellySearch/main/icon.png"
+artifacts:
+- "Jellyfin.Plugin.JellySearch.dll"
+changelog: >
+  Erstes Release: Jahres-Schieberegler, Tag-Raster und Tag-Ausschluss.
